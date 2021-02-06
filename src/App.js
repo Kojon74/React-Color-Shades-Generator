@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import "./App.css";
 
@@ -6,6 +6,13 @@ const App = () => {
   const [inputColor, setInputColor] = useState("");
   const [allColors, setAllColors] = useState([]);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+    return () => clearTimeout(timeout);
+  }, [copied]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,6 +47,11 @@ const App = () => {
     }
   };
 
+  const copyClipboard = (color) => {
+    navigator.clipboard.writeText(color.color);
+    setCopied(true);
+  };
+
   return (
     <section className="app">
       <form onSubmit={handleSubmit}>
@@ -53,6 +65,7 @@ const App = () => {
         />
         <button>Submit</button>
       </form>
+      <h2>{copied && "Copied to clipboard"}</h2>
       <div className="grid-container">
         {allColors.map((color, i) => {
           return (
@@ -60,7 +73,7 @@ const App = () => {
               key={color.id}
               className="grid"
               style={{ backgroundColor: color.color }}
-              onClick={() => navigator.clipboard.writeText(color.color)}
+              onClick={() => copyClipboard(color)}
             >
               <p>{Math.abs(100 - 10 * i)}%</p>
               <p>{color.color}</p>
